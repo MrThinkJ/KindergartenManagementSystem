@@ -6,7 +6,10 @@ import java.util.List;
 
 public interface ChildService {
     ChildDTO getChildById(Integer id);
+    ChildDTO getChildByParentId(Integer parentId);
     List<ChildDTO> getAllChildByClassroom(Integer classroomId);
     List<ChildDTO> getAllChildByTeacher(Integer teacherId);
     ChildDTO addNewChild(ChildDTO childDTO);
+    ChildDTO updateChildById(Integer id, ChildDTO childDTO);
+    String deleteChildById(Integer id);
 }

@@ -35,6 +35,12 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Override
+    public ChildDTO getChildByParentId(Integer parentId) {
+        Child child = childRepository.findByParentId(parentId);
+        return mapToDTO(child);
+    }
+
+    @Override
     public List<ChildDTO> getAllChildByClassroom(Integer classroomId) {
         List<Child> children = childRepository.findAllByClassroomId(classroomId);
         return children.stream().map(this::mapToDTO).collect(Collectors.toList());
@@ -51,7 +57,7 @@ public class ChildServiceImpl implements ChildService {
         Child child = mapAddToEntity(childDTO);
         User parent = userRepository.findById(childDTO.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Parent", "id", childDTO.getParentId()));
         User teacher = userRepository.findById(childDTO.getTeacherId()).orElseThrow(() -> new ResourceNotFoundException("Teacher", "id", childDTO.getTeacherId()));
-        Classroom classroom = classroomRepository.findById(childDTO.getClassroomId()).orElseThrow(()-> new ResourceNotFoundException("Class","id", childDTO.getClassroomId()));
+        Classroom classroom = classroomRepository.findById(childDTO.getClassroomId()).orElseThrow(()-> new ResourceNotFoundException("Classroom","id", childDTO.getClassroomId()));
         child.setParent(parent);
         child.setTeacher(teacher);
         child.setClassroom(classroom);
@@ -63,6 +69,26 @@ public class ChildServiceImpl implements ChildService {
         child.setAlbums(albums);
         Child newChild = childRepository.save(child);
         return mapToDTO(newChild);
+    }
+
+    @Override
+    public ChildDTO updateChildById(Integer id, ChildDTO childDTO) {
+        Child child = childRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Child", "id", id));
+        User parent = userRepository.findById(childDTO.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Parent", "id", childDTO.getParentId()));
+        User teacher = userRepository.findById(childDTO.getTeacherId()).orElseThrow(() -> new ResourceNotFoundException("Teacher", "id", childDTO.getParentId()));
+        Classroom classroom = classroomRepository.findById(childDTO.getClassroomId()).orElseThrow(() -> new ResourceNotFoundException("Classroom", "id", childDTO.getClassroomId()));
+        child.setParent(parent);
+        child.setTeacher(teacher);
+        child.setClassroom(classroom);
+        Child updatedChild = childRepository.save(child);
+        return mapToDTO(updatedChild);
+    }
+
+    @Override
+    public String deleteChildById(Integer id) {
+        Child child = childRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Child", "id", id));
+        childRepository.delete(child);
+        return "Child deleted successfully !";
     }
 
     private Child mapToEntity(ChildDTO childDTO){
