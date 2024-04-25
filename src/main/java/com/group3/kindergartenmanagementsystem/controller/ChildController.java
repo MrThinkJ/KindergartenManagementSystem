@@ -1,5 +1,6 @@
 package com.group3.kindergartenmanagementsystem.controller;
 
+import com.group3.kindergartenmanagementsystem.payload.AddChildToObjectDTO;
 import com.group3.kindergartenmanagementsystem.payload.ChildDTO;
 import com.group3.kindergartenmanagementsystem.service.ChildService;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/children")
@@ -46,5 +48,10 @@ public class ChildController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteChildById(@PathVariable Integer id){
         return ResponseEntity.ok(childService.deleteChildById(id));
+    }
+
+    @PutMapping("/add/classroom")
+    public ResponseEntity<List<ChildDTO>> addChildToClassroom(@RequestBody AddChildToObjectDTO addChildToObjectDTO){
+        return ResponseEntity.ok(childService.addChildToClassroom(addChildToObjectDTO.getChildIds(),addChildToObjectDTO.getObjectId()));
     }
 }

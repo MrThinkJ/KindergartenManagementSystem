@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackOn = Exception.class)
     public UserDTO createNewUser(UserDTO userDTO) {
         Role role = roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Teacher));
-        Set<Role> roles = new HashSet<>();
+            Set<Role> roles = new HashSet<>();
         roles.add(role);
         User user = User.builder()
                 .fullName(userDTO.getFullName())
