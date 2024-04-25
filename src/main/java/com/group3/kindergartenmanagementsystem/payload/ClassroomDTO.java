@@ -14,5 +14,5 @@ import java.util.Set;
 public class ClassroomDTO {
     private Integer id;
     private String name;
-    private List<Integer> children;
+    private Set<Integer> childIds;
 }

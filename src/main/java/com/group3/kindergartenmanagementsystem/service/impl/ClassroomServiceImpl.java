@@ -52,7 +52,7 @@ public class ClassroomServiceImpl implements ClassroomService {
     @Override
     public ClassroomDTO updateClassroomById(Integer id, ClassroomDTO classroomDTO) {
         Classroom classroom = classroomRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Classroom", "id", id));
-        Set<Child> children = classroomDTO.getChildren().stream().map(
+        Set<Child> children = classroomDTO.getChildIds().stream().map(
                 childId -> childRepository.findById(childId).orElseThrow(()-> new ResourceNotFoundException("Child", "id", childId))).collect(Collectors.toSet());
         classroom.setChildren(children);
         classroom.setName(classroomDTO.getName());
@@ -68,7 +68,12 @@ public class ClassroomServiceImpl implements ClassroomService {
     }
 
     private ClassroomDTO mapToDTO(Classroom classroom){
-        return mapper.map(classroom, ClassroomDTO.class);
+        Set<Integer> childIds = classroom.getChildren().stream().map(Child::getId).collect(Collectors.toSet());
+        return ClassroomDTO.builder()
+                .id(classroom.getId())
+                .name(classroom.getName())
+                .childIds(childIds)
+                .build();
     }
 
     private Classroom mapToEntity(ClassroomDTO classroomDTO){

@@ -129,8 +129,9 @@ public class ChildServiceImpl implements ChildService {
     private ChildDTO mapToDTO(Child child){
         ChildDTO childDTO = modelMapper.map(child, ChildDTO.class);
         childDTO.setParentId(child.getParent().getId());
-        childDTO.setTeacherId(child.getTeacher().getId());
-        childDTO.setClassroomId(child.getClassroom().getId());
+
+        childDTO.setTeacherId(child.getTeacher() == null ? null : child.getTeacher().getId());
+        childDTO.setClassroomId(child.getClassroom() == null ? null : child.getClassroom().getId());
         return childDTO;
     }
 
