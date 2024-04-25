@@ -1,5 +1,6 @@
 package com.group3.kindergartenmanagementsystem.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,7 @@ public class Child {
     @Column(nullable = false)
     private Integer age;
     @Column(nullable = false)
+    @JsonFormat(pattern="dd-MM-yyyy")
     private LocalDate birthDay;
     @Column(nullable = false)
     private Integer height;
@@ -34,10 +36,10 @@ public class Child {
     @JoinColumn(name = "parent_id")
     private User parent;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "teacher_id", nullable = false)
+    @JoinColumn(name = "teacher_id")
     private User teacher;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "classroom_id", nullable = false)
+    @JoinColumn(name = "classroom_id")
     private Classroom classroom;
     @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentForChild> comments = new ArrayList<>();

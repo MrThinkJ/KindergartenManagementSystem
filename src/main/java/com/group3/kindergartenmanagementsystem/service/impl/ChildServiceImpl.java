@@ -1,13 +1,18 @@
 package com.group3.kindergartenmanagementsystem.service.impl;
 
+import com.group3.kindergartenmanagementsystem.exception.APIException;
 import com.group3.kindergartenmanagementsystem.exception.ResourceNotFoundException;
 import com.group3.kindergartenmanagementsystem.model.*;
 import com.group3.kindergartenmanagementsystem.payload.ChildDTO;
 import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.repository.ClassroomRepository;
+import com.group3.kindergartenmanagementsystem.repository.RoleRepository;
 import com.group3.kindergartenmanagementsystem.repository.UserRepository;
 import com.group3.kindergartenmanagementsystem.service.ChildService;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,18 +20,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class ChildServiceImpl implements ChildService {
     ChildRepository childRepository;
     UserRepository userRepository;
     ClassroomRepository classroomRepository;
+    RoleRepository roleRepository;
     ModelMapper modelMapper;
-
-    public ChildServiceImpl(ChildRepository childRepository, UserRepository userRepository, ClassroomRepository classroomRepository, ModelMapper modelMapper) {
-        this.childRepository = childRepository;
-        this.userRepository = userRepository;
-        this.classroomRepository = classroomRepository;
-        this.modelMapper = modelMapper;
-    }
 
     @Override
     public ChildDTO getChildById(Integer id) {
@@ -53,7 +53,7 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Override
-    public ChildDTO addNewChild(ChildDTO childDTO) {
+    public ChildDTO createNewChild(ChildDTO childDTO) {
         Child child = mapAddToEntity(childDTO);
         User parent = userRepository.findById(childDTO.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Parent", "id", childDTO.getParentId()));
         User teacher = userRepository.findById(childDTO.getTeacherId()).orElseThrow(() -> new ResourceNotFoundException("Teacher", "id", childDTO.getTeacherId()));
@@ -72,10 +72,41 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
+    public List<ChildDTO> addChildToClassroom(List<Integer> childIds, Integer classroomId) {
+        Classroom classroom = classroomRepository.findById(classroomId).orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId));
+        return childIds.stream().map(
+                childId->{
+                    Child child = childRepository.findById(childId).orElseThrow(()-> new ResourceNotFoundException("Child", "id", childId));
+                    child.setClassroom(classroom);
+                    Child updatedChild = childRepository.save(child);
+                    return mapToDTO(updatedChild);
+                }
+        ).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public List<ChildDTO> addChildToTeacher(List<Integer> childIds, Integer teacherId) {
+        User teacher = userRepository.findById(teacherId).orElseThrow(()-> new ResourceNotFoundException("User", "id", teacherId));
+        Role teacherRole = roleRepository.findByRoleName("ROLE_TEACHER");
+        if (!teacher.getRoles().contains(teacherRole))
+            throw new APIException(HttpStatus.BAD_REQUEST, "This user doesn't have teacher role");
+        return childIds.stream().map(
+                childId ->{
+                    Child child = childRepository.findById(childId).orElseThrow(()-> new ResourceNotFoundException("Child", "id", childId));
+                    child.setTeacher(teacher);
+                    Child updatedChild = childRepository.save(child);
+                    return mapToDTO(updatedChild);
+                }
+        ).collect(Collectors.toList());
+    }
+
+    @Override
     public ChildDTO updateChildById(Integer id, ChildDTO childDTO) {
         Child child = childRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Child", "id", id));
         User parent = userRepository.findById(childDTO.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Parent", "id", childDTO.getParentId()));
-        User teacher = userRepository.findById(childDTO.getTeacherId()).orElseThrow(() -> new ResourceNotFoundException("Teacher", "id", childDTO.getParentId()));
+        User teacher = userRepository.findById(childDTO.getTeacherId()).orElseThrow(() -> new ResourceNotFoundException("Teacher", "id", childDTO.getTeacherId()));
         Classroom classroom = classroomRepository.findById(childDTO.getClassroomId()).orElseThrow(() -> new ResourceNotFoundException("Classroom", "id", childDTO.getClassroomId()));
         child.setParent(parent);
         child.setTeacher(teacher);

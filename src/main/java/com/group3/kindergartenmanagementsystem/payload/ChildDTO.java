@@ -1,5 +1,6 @@
 package com.group3.kindergartenmanagementsystem.payload;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.group3.kindergartenmanagementsystem.model.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ public class ChildDTO {
     private Integer id;
     private String fullName;
     private Integer age;
+    @JsonFormat(pattern="dd-MM-yyyy")
     private LocalDate birthDay;
     private Integer height;
     private Integer weight;
