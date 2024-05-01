@@ -4,6 +4,7 @@ import com.group3.kindergartenmanagementsystem.payload.ClassroomDTO;
 import com.group3.kindergartenmanagementsystem.service.ClassroomService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,27 +19,32 @@ public class ClassroomController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole({'ADMIN', 'TEACHER'})")
     public ResponseEntity<List<ClassroomDTO>> getAllClassroom(){
         return ResponseEntity.ok(classroomService.getAllClassroom());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole({'ADMIN', 'TEACHER'})")
     public ResponseEntity<ClassroomDTO> getClassroomById(@PathVariable Integer id){
         return ResponseEntity.ok(classroomService.getClassroomById(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ClassroomDTO> createNewClassroom(@RequestBody ClassroomDTO classroomDTO){
         return new ResponseEntity<>(classroomService.createNewClassroom(classroomDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ClassroomDTO> updateClassroomById(@PathVariable Integer id,
                                                             @RequestBody ClassroomDTO classroomDTO){
         return ResponseEntity.ok(classroomService.updateClassroomById(id, classroomDTO));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteClassroomById(@PathVariable Integer id){
         return ResponseEntity.ok(classroomService.deleteClassroomById(id));
     }

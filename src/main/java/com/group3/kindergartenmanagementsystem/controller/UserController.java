@@ -5,6 +5,7 @@ import com.group3.kindergartenmanagementsystem.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,7 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDTO> createNewUser(@RequestBody UserDTO userDTO){
         return new ResponseEntity<>(userService.createNewUser(userDTO), HttpStatus.CREATED);
     }

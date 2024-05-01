@@ -15,6 +15,7 @@ import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -53,12 +54,13 @@ public class UserServiceImpl implements UserService {
         Role role = roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Teacher));
             Set<Role> roles = new HashSet<>();
         roles.add(role);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         User user = User.builder()
                 .fullName(userDTO.getFullName())
                 .phoneNumber(userDTO.getPhoneNumber())
                 .address(userDTO.getAddress())
                 .email(userDTO.getEmail())
-                .password(userDTO.getPassword())
+                .password(encoder.encode(userDTO.getPassword()))
                 .roles(roles)
                 .build();
         User newTeacher = userRepository.save(user);
