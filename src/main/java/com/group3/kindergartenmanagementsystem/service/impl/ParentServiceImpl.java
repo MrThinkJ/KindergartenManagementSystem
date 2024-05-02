@@ -14,6 +14,7 @@ import com.group3.kindergartenmanagementsystem.service.UserService;
 import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -39,6 +40,7 @@ public class ParentServiceImpl implements ParentService {
         roleSet.add(role);
         User user = mapToEntity(userDTO);
         user.setRoles(roleSet);
+        user.setPassword(new BCryptPasswordEncoder().encode(userDTO.getPassword()));
         User newUser = userRepository.save(user);
         Child child = Child.builder()
                 .fullName(childDTO.getFullName())
