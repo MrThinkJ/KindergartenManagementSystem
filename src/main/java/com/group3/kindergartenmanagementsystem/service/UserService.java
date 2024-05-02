@@ -9,4 +9,5 @@ public interface UserService {
     UserDTO getUserById(Integer id);
     UserDTO updateUserById(Integer id, UserDTO userDTO);
     UserDTO createNewUser(UserDTO userDTO);
+    void deleteUserById(Integer id);
 }

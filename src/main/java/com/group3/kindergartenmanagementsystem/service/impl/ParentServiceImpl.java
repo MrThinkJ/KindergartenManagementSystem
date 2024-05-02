@@ -10,13 +10,16 @@ import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.repository.RoleRepository;
 import com.group3.kindergartenmanagementsystem.repository.UserRepository;
 import com.group3.kindergartenmanagementsystem.service.ParentService;
+import com.group3.kindergartenmanagementsystem.service.UserService;
 import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.group3.kindergartenmanagementsystem.service.impl.UserServiceImpl.mapToDTO;
 import static com.group3.kindergartenmanagementsystem.service.impl.UserServiceImpl.mapToEntity;
@@ -53,4 +56,13 @@ public class ParentServiceImpl implements ParentService {
                 .childDTO(mapper.map(createdChild, ChildDTO.class))
                 .build();
     }
+    @Override
+    public List<UserDTO> getAllParent() {
+        Set<Role> roleSet = new HashSet<>();
+        Role role = roleRepository.findByRoleName("ROLE_PARENT");
+        roleSet.add(role);
+        List<User> users = userRepository.findByRoles(roleSet);
+        return users.stream().map(UserServiceImpl::mapToDTO).collect(Collectors.toList());
+    }
+
 }

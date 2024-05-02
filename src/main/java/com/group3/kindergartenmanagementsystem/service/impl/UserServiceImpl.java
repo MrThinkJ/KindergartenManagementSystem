@@ -67,6 +67,14 @@ public class UserServiceImpl implements UserService {
         return mapToDTO(newTeacher);
     }
 
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void deleteUserById(Integer id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("User", "id", id));
+        userRepository.delete(user);
+    }
+
     static UserDTO mapToDTO(User user) {
         return UserDTO.builder()
                 .id(user.getId())

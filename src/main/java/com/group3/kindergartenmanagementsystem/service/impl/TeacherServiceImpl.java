@@ -3,7 +3,9 @@ package com.group3.kindergartenmanagementsystem.service.impl;
 import com.group3.kindergartenmanagementsystem.exception.APIException;
 import com.group3.kindergartenmanagementsystem.exception.ResourceNotFoundException;
 import com.group3.kindergartenmanagementsystem.model.Child;
+import com.group3.kindergartenmanagementsystem.model.Role;
 import com.group3.kindergartenmanagementsystem.model.User;
+import com.group3.kindergartenmanagementsystem.payload.UserDTO;
 import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.repository.ClassroomRepository;
 import com.group3.kindergartenmanagementsystem.repository.RoleRepository;
@@ -16,7 +18,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -38,5 +43,14 @@ public class TeacherServiceImpl implements TeacherService {
             childRepository.save(child);
         });
         return String.format("Add teacher %s to %s", teacher.getFullName(), className);
+    }
+
+    @Override
+    public List<UserDTO> getAllTeacher() {
+        Set<Role> roleSet = new HashSet<>();
+        Role role = roleRepository.findByRoleName("ROLE_TEACHER");
+        roleSet.add(role);
+        List<User> users = userRepository.findByRoles(roleSet);
+        return users.stream().map(UserServiceImpl::mapToDTO).collect(Collectors.toList());
     }
 }

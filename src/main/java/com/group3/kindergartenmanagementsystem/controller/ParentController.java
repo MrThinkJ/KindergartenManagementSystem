@@ -10,12 +10,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Optional;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/parent")
 public class ParentController {
     UserService userService;
     ParentService parentService;
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserDTO>> getAllParent(){
+        return ResponseEntity.of(Optional.ofNullable(parentService.getAllParent()));
+    }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
