@@ -19,13 +19,13 @@ public class CommentForChildController {
     }
 
     @GetMapping("/child/{id}")
-    @PreAuthorize("hasRole({'TEACHER', 'PARENT'})")
+    @PreAuthorize("hasAnyRole('TEACHER', 'PARENT')")
     public ResponseEntity<List<CommentForChildDTO>> getAllCommentByChildId(@PathVariable Integer id){
         return ResponseEntity.ok(commentForChildService.getAllCommentByChildId(id));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole({'TEACHER', 'PARENT'})")
+    @PreAuthorize("hasAnyRole('TEACHER', 'PARENT')")
     public ResponseEntity<CommentForChildDTO> getCommentById(@PathVariable Integer id){
         return ResponseEntity.ok(commentForChildService.getCommentById(id));
     }

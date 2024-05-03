@@ -28,32 +28,32 @@ public class AlbumController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole({'PARENT', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<AlbumDTO> getPictureById(@PathVariable Integer id){
         return ResponseEntity.ok(albumService.getPictureById(id));
     }
 
     @GetMapping("/child/{id}")
-    @PreAuthorize("hasRole({'PARENT', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<List<AlbumDTO>> getAlbumByChildId(@PathVariable(value = "id") Integer childId){
         return ResponseEntity.ok(albumService.getAlbumByChildId(childId));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole({'PARENT', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<AlbumDTO> createNewAlbum(@ModelAttribute AddAlbumDTO addAlbumDTO){
         return new ResponseEntity<>(albumService.createNewPicture(addAlbumDTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole({'PARENT', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<String> deletePictureById(@PathVariable Integer id){
         albumService.deletePictureById(id);
         return ResponseEntity.ok("Delete successfully");
     }
 
     @GetMapping("/picture/{filename:.+}")
-    @PreAuthorize("hasRole({'PARENT', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<Resource> getFile(@PathVariable String filename){
         Resource file = fileStorageService.load(filename);
         return ResponseEntity.ok()
@@ -62,7 +62,7 @@ public class AlbumController {
     }
 
     @GetMapping("/download/picture/{filename:.+}")
-    @PreAuthorize("hasRole({'PARENT', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename){
         Resource file = fileStorageService.load(filename);
         return ResponseEntity.ok()

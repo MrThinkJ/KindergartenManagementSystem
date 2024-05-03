@@ -21,31 +21,31 @@ public class ChildController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole({'PARENT', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<ChildDTO> getChildById(@PathVariable Integer id){
         return ResponseEntity.ok(childService.getChildById(id));
     }
 
     @GetMapping("/parent/{id}")
-    @PreAuthorize("hasRole({'PARENT', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<ChildDTO> getChildByParentId(@PathVariable Integer id){
         return ResponseEntity.ok(childService.getChildByParentId(id));
     }
 
     @GetMapping("/classroom/{id}")
-    @PreAuthorize("hasRole({'TEACHER', 'ADMIN'})")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public ResponseEntity<List<ChildDTO>> getAllChildByClassroomId(@PathVariable Integer id){
         return ResponseEntity.ok(childService.getAllChildByClassroom(id));
     }
 
     @GetMapping("/teacher/{id}")
-    @PreAuthorize("hasRole({'TEACHER', 'ADMIN'})")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public ResponseEntity<List<ChildDTO>> getAllChildByTeacherId(@PathVariable Integer id){
         return ResponseEntity.ok(childService.getAllChildByTeacher(id));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole({'PARENT', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<ChildDTO> updateChildById(@PathVariable Integer id,
                                                     @RequestBody ChildDTO childDTO){
         return ResponseEntity.ok(childService.updateChildById(id, childDTO));

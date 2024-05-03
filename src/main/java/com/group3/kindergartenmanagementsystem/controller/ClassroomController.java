@@ -19,13 +19,13 @@ public class ClassroomController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole({'ADMIN', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<List<ClassroomDTO>> getAllClassroom(){
         return ResponseEntity.ok(classroomService.getAllClassroom());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole({'ADMIN', 'TEACHER'})")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<ClassroomDTO> getClassroomById(@PathVariable Integer id){
         return ResponseEntity.ok(classroomService.getClassroomById(id));
     }
