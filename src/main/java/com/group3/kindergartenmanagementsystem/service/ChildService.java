@@ -8,6 +8,7 @@ public interface ChildService {
     ChildDTO getChildById(Integer id);
 
     ChildDTO getChildByParentId(Integer parentId);
+    List<ChildDTO> getAllChild();
 
     List<ChildDTO> getAllChildByClassroom(Integer classroomId);
 

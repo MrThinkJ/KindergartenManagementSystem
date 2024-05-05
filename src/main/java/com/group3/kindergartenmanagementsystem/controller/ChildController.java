@@ -18,6 +18,12 @@ public class ChildController {
         this.childService = childService;
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ChildDTO>> getAllChild(){
+        return ResponseEntity.ok(childService.getAllChild());
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<ChildDTO> getChildById(@PathVariable Integer id){

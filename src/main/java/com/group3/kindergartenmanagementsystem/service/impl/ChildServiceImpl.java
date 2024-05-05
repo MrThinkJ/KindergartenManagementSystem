@@ -54,6 +54,11 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Override
+    public List<ChildDTO> getAllChild() {
+        return childRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
     public List<ChildDTO> getAllChildByClassroom(Integer classroomId) {
         Classroom classroom = classroomRepository.findById(classroomId)
                 .orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId));
