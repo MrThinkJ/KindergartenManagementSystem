@@ -10,6 +10,8 @@ import com.group3.kindergartenmanagementsystem.service.MedicineReminderService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.cglib.core.Local;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +25,8 @@ public class MedicineReminderServiceImpl implements MedicineReminderService {
     ChildRepository childRepository;
     @Override
     public MedicineReminderDTO getMedicineReminderById(Integer id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(username);
         MedicineReminder medicineReminder = medicineReminderRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Medicine reminder", "id", id));
         return mapToDTO(medicineReminder);
@@ -30,6 +34,7 @@ public class MedicineReminderServiceImpl implements MedicineReminderService {
 
     @Override
     public List<MedicineReminderDTO> getMedicineReminderByChildId(Integer childId) {
+
         List<MedicineReminder> medicineReminders = medicineReminderRepository.findByChildId(childId);
         return medicineReminders.stream().map(this::mapToDTO).collect(Collectors.toList());
     }

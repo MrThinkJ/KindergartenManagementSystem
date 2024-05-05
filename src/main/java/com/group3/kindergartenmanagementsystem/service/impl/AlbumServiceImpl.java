@@ -1,5 +1,6 @@
 package com.group3.kindergartenmanagementsystem.service.impl;
 
+import com.group3.kindergartenmanagementsystem.exception.ForbiddenAccessException;
 import com.group3.kindergartenmanagementsystem.exception.ResourceNotFoundException;
 import com.group3.kindergartenmanagementsystem.model.Album;
 import com.group3.kindergartenmanagementsystem.model.Child;
@@ -10,10 +11,12 @@ import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.service.AlbumService;
 import com.group3.kindergartenmanagementsystem.service.CloudinaryService;
 import com.group3.kindergartenmanagementsystem.service.FileStorageService;
+import com.group3.kindergartenmanagementsystem.service.SecurityService;
 import com.group3.kindergartenmanagementsystem.utils.AppConstants;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +38,7 @@ public class AlbumServiceImpl implements AlbumService {
     ChildRepository childRepository;
     CloudinaryService cloudinaryService;
     FileStorageService fileStorageService;
+    SecurityService securityService;
     ModelMapper mapper;
 
     @Override
@@ -45,12 +49,21 @@ public class AlbumServiceImpl implements AlbumService {
     @Override
     public AlbumDTO getPictureById(Integer id) {
         Album album = albumRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Album", "id", id));
+        if (!securityService.isParentOrTeacherOfChild(album.getChild()))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this picture");
         return mapToDTO(album);
     }
 
     @Override
     public List<AlbumDTO> getAlbumByChildId(Integer childId) {
-        List<Album> albums = albumRepository.findByChildId(childId);
+        Child child = childRepository.findById(childId)
+                .orElseThrow(()-> new ResourceNotFoundException("Child", "id", childId));
+        List<Album> albums = albumRepository.findByChild(child);
+        if (!albums.isEmpty())
+            if (!securityService.isParentOrTeacherOfChild(albums.get(0).getChild()))
+                throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this albums");
         return albums.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
@@ -59,6 +72,9 @@ public class AlbumServiceImpl implements AlbumService {
     public AlbumDTO createNewPicture(AddAlbumDTO addAlbumDTO) {
         Child child = childRepository.findById(addAlbumDTO.getChildId()).orElseThrow(
                 () ->new ResourceNotFoundException("Child", "id", addAlbumDTO.getChildId()));
+        if (!securityService.isParentOrTeacherOfChild(child))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this child album");
         Album album = Album.builder()
                 .child(child)
                 .postedTime(LocalDateTime.now())
@@ -78,6 +94,9 @@ public class AlbumServiceImpl implements AlbumService {
     @Transactional(rollbackOn = Exception.class)
     public void deletePictureById(Integer id) {
         Album album = albumRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Album", "id", id));
+        if (!securityService.isParentOrTeacherOfChild(album.getChild()))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this picture");
         String fileName = album.getImage();
         try{
             Files.move(Paths.get(AppConstants.UPLOAD_FOLDER).resolve(fileName),

@@ -1,6 +1,7 @@
 package com.group3.kindergartenmanagementsystem.service.impl;
 
 import com.group3.kindergartenmanagementsystem.exception.APIException;
+import com.group3.kindergartenmanagementsystem.exception.ForbiddenAccessException;
 import com.group3.kindergartenmanagementsystem.exception.ResourceNotFoundException;
 import com.group3.kindergartenmanagementsystem.model.*;
 import com.group3.kindergartenmanagementsystem.payload.ChildDTO;
@@ -9,14 +10,17 @@ import com.group3.kindergartenmanagementsystem.repository.ClassroomRepository;
 import com.group3.kindergartenmanagementsystem.repository.RoleRepository;
 import com.group3.kindergartenmanagementsystem.repository.UserRepository;
 import com.group3.kindergartenmanagementsystem.service.ChildService;
+import com.group3.kindergartenmanagementsystem.service.SecurityService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,29 +30,50 @@ public class ChildServiceImpl implements ChildService {
     UserRepository userRepository;
     ClassroomRepository classroomRepository;
     RoleRepository roleRepository;
+    SecurityService securityService;
     ModelMapper modelMapper;
 
     @Override
     public ChildDTO getChildById(Integer id) {
         Child child = childRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Child", "id", id));
+        if (!securityService.isParentOrTeacherOfChild(child))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this child");
         return mapToDTO(child);
     }
 
     @Override
     public ChildDTO getChildByParentId(Integer parentId) {
-        Child child = childRepository.findByParentId(parentId);
+        User parent = userRepository.findById(parentId)
+                .orElseThrow(()-> new ResourceNotFoundException("Parent", "id", parentId));
+        Child child = childRepository.findByParent(parent);
+        if (!securityService.isParentOrTeacherOfChild(child))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this child");
         return mapToDTO(child);
     }
 
     @Override
     public List<ChildDTO> getAllChildByClassroom(Integer classroomId) {
-        List<Child> children = childRepository.findAllByClassroomId(classroomId);
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId));
+        List<Child> children = childRepository.findAllByClassroom(classroom);
+        if (!children.isEmpty())
+            if (!securityService.isParentOrTeacherOfChild(children.get(0)))
+                throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                        "User with username: "+securityService.getUsername()+" can't access to this class");
         return children.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
     public List<ChildDTO> getAllChildByTeacher(Integer teacherId) {
-        List<Child> children = childRepository.findAllByTeacherId(teacherId);
+        User teacher = userRepository.findById(teacherId)
+                .orElseThrow(()-> new ResourceNotFoundException("Teacher", "id", teacherId));
+        List<Child> children = childRepository.findAllByTeacher(teacher);
+        if (!children.isEmpty())
+            if (!securityService.isParentOrTeacherOfChild(children.get(0)))
+                throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                        "User with username: "+securityService.getUsername()+" can't access to this class");
         return children.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
@@ -105,12 +130,17 @@ public class ChildServiceImpl implements ChildService {
     @Override
     public ChildDTO updateChildById(Integer id, ChildDTO childDTO) {
         Child child = childRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Child", "id", id));
-        User parent = userRepository.findById(childDTO.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Parent", "id", childDTO.getParentId()));
-        User teacher = userRepository.findById(childDTO.getTeacherId()).orElseThrow(() -> new ResourceNotFoundException("Teacher", "id", childDTO.getTeacherId()));
-        Classroom classroom = classroomRepository.findById(childDTO.getClassroomId()).orElseThrow(() -> new ResourceNotFoundException("Classroom", "id", childDTO.getClassroomId()));
-        child.setParent(parent);
-        child.setTeacher(teacher);
-        child.setClassroom(classroom);
+        if (!securityService.isParentOrTeacherOfChild(child))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this class");
+        if (securityService.compareRole("ROLE_ADMIN")){
+            User parent = userRepository.findById(childDTO.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Parent", "id", childDTO.getParentId()));
+            User teacher = userRepository.findById(childDTO.getTeacherId()).orElseThrow(() -> new ResourceNotFoundException("Teacher", "id", childDTO.getTeacherId()));
+            Classroom classroom = classroomRepository.findById(childDTO.getClassroomId()).orElseThrow(() -> new ResourceNotFoundException("Classroom", "id", childDTO.getClassroomId()));
+            child.setParent(parent);
+            child.setTeacher(teacher);
+            child.setClassroom(classroom);
+        }
         Child updatedChild = childRepository.save(child);
         return mapToDTO(updatedChild);
     }
@@ -120,6 +150,14 @@ public class ChildServiceImpl implements ChildService {
         Child child = childRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Child", "id", id));
         childRepository.delete(child);
         return "Child deleted successfully !";
+    }
+
+    @Override
+    public Boolean isParentOfLoggedInUser(Integer childId, String username) {
+        User user = userRepository.findByPhoneNumberOrEmail(username, username)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found with username: "+username));
+        Optional<Child> child = childRepository.findById(childId);
+        return child.isPresent() && child.get().getParent().getId().equals(user.getId());
     }
 
     private Child mapToEntity(ChildDTO childDTO){

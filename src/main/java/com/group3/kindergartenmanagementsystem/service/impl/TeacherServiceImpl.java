@@ -33,9 +33,11 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public String addTeacherToClass(Integer teacherId, Integer classroomId) {
+        User teacher = userRepository.findById(teacherId).orElseThrow(
+                ()-> new ResourceNotFoundException("Teacher", "id", teacherId)
+        );
         String className = classroomRepository.findById(classroomId).orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId)).getName();
-        List<Child> children = childRepository.findAllByClassroomId(classroomId);
-        User teacher = userRepository.findById(teacherId).orElseThrow(()-> new ResourceNotFoundException("Teacher", "id", teacherId));
+        List<Child> children = childRepository.findAllByTeacher(teacher);
         if(!teacher.getRoles().contains(roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Teacher))))
             throw new APIException(HttpStatus.BAD_REQUEST, "This id is not belong to teacher");
         children.forEach(child->{

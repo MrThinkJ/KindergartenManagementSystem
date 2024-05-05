@@ -7,27 +7,21 @@ import com.group3.kindergartenmanagementsystem.payload.ClassroomDTO;
 import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.repository.ClassroomRepository;
 import com.group3.kindergartenmanagementsystem.service.ClassroomService;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
+@AllArgsConstructor
 public class ClassroomServiceImpl implements ClassroomService {
     ClassroomRepository classroomRepository;
     ChildRepository childRepository;
     ModelMapper mapper;
-
-    public ClassroomServiceImpl(ClassroomRepository classroomRepository, ChildRepository childRepository, ModelMapper mapper) {
-        this.childRepository = childRepository;
-        this.classroomRepository = classroomRepository;
-        this.mapper = mapper;
-    }
 
     @Override
     public List<ClassroomDTO> getAllClassroom() {

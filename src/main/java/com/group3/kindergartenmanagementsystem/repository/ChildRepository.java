@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface ChildRepository extends JpaRepository<Child, Integer> {
-    List<Child> findAllByTeacherId(Integer teacherId);
-    List<Child> findAllByClassroomId(Integer classroomId);
-    Child findByParentId(Integer parentId);
+    List<Child> findAllByTeacher(User teacher);
+    List<Child> findAllByClassroom(Classroom classroom);
+    Child findByParent(User parent);
 }
