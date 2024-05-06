@@ -7,6 +7,7 @@ import java.util.List;
 public interface ClassroomService {
     List<ClassroomDTO> getAllClassroom();
     ClassroomDTO getClassroomById(Integer id);
+    ClassroomDTO getClassroomByChildId(Integer childId);
     ClassroomDTO createNewClassroom(ClassroomDTO classroomDTO);
     ClassroomDTO updateClassroomById(Integer id, ClassroomDTO classroomDTO);
     String deleteClassroomById(Integer id);
