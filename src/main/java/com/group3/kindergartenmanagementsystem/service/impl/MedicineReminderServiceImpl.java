@@ -1,5 +1,6 @@
 package com.group3.kindergartenmanagementsystem.service.impl;
 
+import com.group3.kindergartenmanagementsystem.exception.ForbiddenAccessException;
 import com.group3.kindergartenmanagementsystem.exception.ResourceNotFoundException;
 import com.group3.kindergartenmanagementsystem.model.Child;
 import com.group3.kindergartenmanagementsystem.model.MedicineReminder;
@@ -7,9 +8,11 @@ import com.group3.kindergartenmanagementsystem.payload.MedicineReminderDTO;
 import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.repository.MedicineReminderRepository;
 import com.group3.kindergartenmanagementsystem.service.MedicineReminderService;
+import com.group3.kindergartenmanagementsystem.service.SecurityService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.cglib.core.Local;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,19 +26,24 @@ import java.util.stream.Collectors;
 public class MedicineReminderServiceImpl implements MedicineReminderService {
     MedicineReminderRepository medicineReminderRepository;
     ChildRepository childRepository;
+    SecurityService securityService;
     @Override
     public MedicineReminderDTO getMedicineReminderById(Integer id) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println(username);
         MedicineReminder medicineReminder = medicineReminderRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Medicine reminder", "id", id));
+        if (!securityService.isParentOrTeacherOfChild(medicineReminder.getChild()))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this child");
         return mapToDTO(medicineReminder);
     }
 
     @Override
     public List<MedicineReminderDTO> getMedicineReminderByChildId(Integer childId) {
-
-        List<MedicineReminder> medicineReminders = medicineReminderRepository.findByChildId(childId);
+        Child child = childRepository.findById(childId).orElseThrow(()->new ResourceNotFoundException("child", "id", childId));
+        if (!securityService.isParentOrTeacherOfChild(child))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this child");
+        List<MedicineReminder> medicineReminders = medicineReminderRepository.findByChild(child);
         return medicineReminders.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
@@ -49,6 +57,9 @@ public class MedicineReminderServiceImpl implements MedicineReminderService {
     public MedicineReminderDTO createNewMedicineReminder(MedicineReminderDTO medicineReminderDTO) {
         Child child = childRepository.findById(medicineReminderDTO.getChildId())
                 .orElseThrow(()-> new ResourceNotFoundException("Child", "id", medicineReminderDTO.getChildId()));
+        if (!securityService.isParentOrTeacherOfChild(child))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this child");
         MedicineReminder medicineReminder = new MedicineReminder();
         medicineReminder.setComment(medicineReminderDTO.getComment());
         medicineReminder.setChild(child);
@@ -63,6 +74,9 @@ public class MedicineReminderServiceImpl implements MedicineReminderService {
     public MedicineReminderDTO updateMedicineReminderById(Integer id, MedicineReminderDTO medicineReminderDTO) {
         MedicineReminder medicineReminder = medicineReminderRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Medicine reminder", "id", id));
+        if (!securityService.isParentOrTeacherOfChild(medicineReminder.getChild()))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this child");
         medicineReminder.setComment(medicineReminderDTO.getComment());
         medicineReminder.setUpdatedDate(LocalDateTime.now());
         MedicineReminder updatedMedicineReminder = medicineReminderRepository.save(medicineReminder);
@@ -74,6 +88,9 @@ public class MedicineReminderServiceImpl implements MedicineReminderService {
     public void deleteMedicineReminderById(Integer id) {
         MedicineReminder medicineReminder = medicineReminderRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Medicine reminder", "id", id));
+        if (!securityService.isParentOrTeacherOfChild(medicineReminder.getChild()))
+            throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
+                    "User with username: "+securityService.getUsername()+" can't access to this child");
         medicineReminderRepository.delete(medicineReminder);
     }
 
