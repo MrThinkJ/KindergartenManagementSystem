@@ -1,6 +1,8 @@
 package com.group3.kindergartenmanagementsystem.service.impl;
 
+import com.group3.kindergartenmanagementsystem.exception.APIException;
 import com.group3.kindergartenmanagementsystem.exception.ResourceNotFoundException;
+import com.group3.kindergartenmanagementsystem.model.Child;
 import com.group3.kindergartenmanagementsystem.model.Role;
 import com.group3.kindergartenmanagementsystem.model.User;
 import com.group3.kindergartenmanagementsystem.payload.UserDTO;
@@ -12,6 +14,7 @@ import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -75,6 +78,13 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(Integer id) {
         User user = userRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("User", "id", id));
+        if(user.getRoles().contains(roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Parent)))){
+            Child child = childRepository.findByParent(user);
+            child.setTeacher(null);
+            childRepository.delete(child);
+        }
+        for (Role role : user.getRoles())
+            role.getUsers().remove(user);
         userRepository.delete(user);
     }
 
