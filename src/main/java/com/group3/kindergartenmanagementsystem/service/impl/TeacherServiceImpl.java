@@ -3,8 +3,10 @@ package com.group3.kindergartenmanagementsystem.service.impl;
 import com.group3.kindergartenmanagementsystem.exception.APIException;
 import com.group3.kindergartenmanagementsystem.exception.ResourceNotFoundException;
 import com.group3.kindergartenmanagementsystem.model.Child;
+import com.group3.kindergartenmanagementsystem.model.Classroom;
 import com.group3.kindergartenmanagementsystem.model.Role;
 import com.group3.kindergartenmanagementsystem.model.User;
+import com.group3.kindergartenmanagementsystem.payload.TeacherDTO;
 import com.group3.kindergartenmanagementsystem.payload.UserDTO;
 import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.repository.ClassroomRepository;
@@ -36,7 +38,9 @@ public class TeacherServiceImpl implements TeacherService {
         User teacher = userRepository.findById(teacherId).orElseThrow(
                 ()-> new ResourceNotFoundException("Teacher", "id", teacherId)
         );
-        String className = classroomRepository.findById(classroomId).orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId)).getName();
+        Classroom classroom = classroomRepository.findById(classroomId).orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId));
+        classroom.setTeacher(teacher);
+        classroomRepository.save(classroom);
         List<Child> children = childRepository.findAllByTeacher(teacher);
         if(!teacher.getRoles().contains(roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Teacher))))
             throw new APIException(HttpStatus.BAD_REQUEST, "This id is not belong to teacher");
@@ -44,15 +48,25 @@ public class TeacherServiceImpl implements TeacherService {
             child.setTeacher(teacher);
             childRepository.save(child);
         });
-        return String.format("Add teacher %s to %s", teacher.getFullName(), className);
+
+        return String.format("Add teacher %s to %s", teacher.getFullName(), classroom.getName());
     }
 
     @Override
-    public List<UserDTO> getAllTeacher() {
+    public List<TeacherDTO> getAllTeacher() {
         Set<Role> roleSet = new HashSet<>();
         Role role = roleRepository.findByRoleName("ROLE_TEACHER");
         roleSet.add(role);
         List<User> users = userRepository.findByRoles(roleSet);
-        return users.stream().map(UserServiceImpl::mapToDTO).collect(Collectors.toList());
+        return users.stream().map(
+                user -> TeacherDTO.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .address(user.getAddress())
+                        .fullName(user.getFullName())
+                        .phoneNumber(user.getPhoneNumber())
+                        .classroomIds(classroomRepository.findByTeacher(user).stream().map(Classroom::getId).collect(Collectors.toList()))
+                        .build()
+        ).collect(Collectors.toList());
     }
 }

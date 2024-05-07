@@ -1,11 +1,8 @@
 package com.group3.kindergartenmanagementsystem.service.impl;
 
 import com.group3.kindergartenmanagementsystem.exception.ResourceNotFoundException;
-import com.group3.kindergartenmanagementsystem.model.Child;
 import com.group3.kindergartenmanagementsystem.model.Role;
 import com.group3.kindergartenmanagementsystem.model.User;
-import com.group3.kindergartenmanagementsystem.payload.ChildDTO;
-import com.group3.kindergartenmanagementsystem.payload.UserCreateDTO;
 import com.group3.kindergartenmanagementsystem.payload.UserDTO;
 import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.repository.RoleRepository;
@@ -19,8 +16,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,6 +27,11 @@ public class UserServiceImpl implements UserService {
     RoleRepository roleRepository;
     ChildRepository childRepository;
     ModelMapper mapper;
+
+    @Override
+    public List<UserDTO> getAllUser() {
+        return userRepository.findAll().stream().map(UserServiceImpl::mapToDTO).collect(Collectors.toList());
+    }
 
     @Override
     public UserDTO getUserById(Integer id) {
@@ -79,8 +82,8 @@ public class UserServiceImpl implements UserService {
         return UserDTO.builder()
                 .id(user.getId())
                 .phoneNumber(user.getPhoneNumber())
-                .password(user.getPassword())
                 .fullName(user.getFullName())
+                .password(user.getPassword())
                 .email(user.getEmail())
                 .address(user.getAddress())
                 .build();
@@ -89,9 +92,9 @@ public class UserServiceImpl implements UserService {
     static User mapToEntity(UserDTO userDTO) {
         return User.builder()
                 .phoneNumber(userDTO.getPhoneNumber())
-                .password(userDTO.getPassword())
                 .fullName(userDTO.getFullName())
                 .email(userDTO.getEmail())
+                .password(userDTO.getPassword())
                 .address(userDTO.getAddress())
                 .build();
     }

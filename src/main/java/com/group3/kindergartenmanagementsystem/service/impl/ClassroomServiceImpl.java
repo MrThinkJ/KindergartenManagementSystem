@@ -1,14 +1,19 @@
 package com.group3.kindergartenmanagementsystem.service.impl;
 
+import com.group3.kindergartenmanagementsystem.exception.APIException;
 import com.group3.kindergartenmanagementsystem.exception.ForbiddenAccessException;
 import com.group3.kindergartenmanagementsystem.exception.ResourceNotFoundException;
 import com.group3.kindergartenmanagementsystem.model.Child;
 import com.group3.kindergartenmanagementsystem.model.Classroom;
+import com.group3.kindergartenmanagementsystem.model.User;
 import com.group3.kindergartenmanagementsystem.payload.ClassroomDTO;
 import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.repository.ClassroomRepository;
+import com.group3.kindergartenmanagementsystem.repository.RoleRepository;
+import com.group3.kindergartenmanagementsystem.repository.UserRepository;
 import com.group3.kindergartenmanagementsystem.service.ClassroomService;
 import com.group3.kindergartenmanagementsystem.service.SecurityService;
+import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -25,6 +30,8 @@ public class ClassroomServiceImpl implements ClassroomService {
     ClassroomRepository classroomRepository;
     ChildRepository childRepository;
     SecurityService securityService;
+    UserRepository userRepository;
+    RoleRepository roleRepository;
     ModelMapper mapper;
 
     @Override
@@ -51,9 +58,20 @@ public class ClassroomServiceImpl implements ClassroomService {
     }
 
     @Override
+    public List<ClassroomDTO> getClassroomByTeacherId(Integer teacherId) {
+        User teacher = userRepository.findById(teacherId).orElseThrow(
+                ()-> new ResourceNotFoundException("Teacher", "id", teacherId)
+        );
+        if(!teacher.getRoles().contains(roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Teacher))))
+            throw new APIException(HttpStatus.BAD_REQUEST, "This id is not belong to teacher");
+        List<Classroom> classrooms = classroomRepository.findByTeacher(teacher);
+        return classrooms.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
     public ClassroomDTO createNewClassroom(ClassroomDTO classroomDTO) {
         Set<Child> children = new HashSet<>();
-        Classroom classroom = new Classroom(classroomDTO.getId(), classroomDTO.getName(), children);
+        Classroom classroom = new Classroom(classroomDTO.getId(), classroomDTO.getName(), children, null);
         Classroom newClassroom = classroomRepository.save(classroom);
         return mapToDTO(newClassroom);
     }
@@ -63,8 +81,12 @@ public class ClassroomServiceImpl implements ClassroomService {
         Classroom classroom = classroomRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Classroom", "id", id));
         Set<Child> children = classroomDTO.getChildIds().stream().map(
                 childId -> childRepository.findById(childId).orElseThrow(()-> new ResourceNotFoundException("Child", "id", childId))).collect(Collectors.toSet());
+        User teacher = userRepository.findById(classroomDTO.getTeacherId()).orElseThrow(
+                ()-> new ResourceNotFoundException("Teacher", "id", classroomDTO.getTeacherId())
+        );
         classroom.setChildren(children);
         classroom.setName(classroomDTO.getName());
+        classroom.setTeacher(teacher);
         Classroom updatedClass = classroomRepository.save(classroom);
         return mapToDTO(updatedClass);
     }
@@ -78,11 +100,14 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     private ClassroomDTO mapToDTO(Classroom classroom){
         Set<Integer> childIds = classroom.getChildren().stream().map(Child::getId).collect(Collectors.toSet());
-        return ClassroomDTO.builder()
+        ClassroomDTO classroomDTO = ClassroomDTO.builder()
                 .id(classroom.getId())
                 .name(classroom.getName())
                 .childIds(childIds)
                 .build();
+        if (classroom.getTeacher() != null)
+            classroomDTO.setTeacherId(classroom.getTeacher().getId());
+        return classroomDTO;
     }
 
     private Classroom mapToEntity(ClassroomDTO classroomDTO){

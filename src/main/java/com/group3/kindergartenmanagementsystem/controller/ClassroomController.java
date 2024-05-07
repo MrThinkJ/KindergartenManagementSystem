@@ -36,6 +36,12 @@ public class ClassroomController {
         return ResponseEntity.ok(classroomService.getClassroomByChildId(id));
     }
 
+    @GetMapping("/teacher/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ClassroomDTO>> getClassroomByTeacherId(@PathVariable Integer id){
+        return ResponseEntity.ok(classroomService.getClassroomByTeacherId(id));
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ClassroomDTO> createNewClassroom(@RequestBody ClassroomDTO classroomDTO){

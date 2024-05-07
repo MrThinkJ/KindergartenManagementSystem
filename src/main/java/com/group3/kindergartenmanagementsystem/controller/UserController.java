@@ -1,5 +1,6 @@
 package com.group3.kindergartenmanagementsystem.controller;
 
+import com.group3.kindergartenmanagementsystem.model.User;
 import com.group3.kindergartenmanagementsystem.payload.UserDTO;
 import com.group3.kindergartenmanagementsystem.service.UserService;
 import lombok.AllArgsConstructor;
@@ -8,11 +9,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/user")
 public class UserController {
     UserService userService;
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> getAllUser(){
+        return ResponseEntity.ok(userService.getAllUser());
+    }
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id){
         return ResponseEntity.ok(userService.getUserById(id));

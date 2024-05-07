@@ -15,4 +15,5 @@ public class ClassroomDTO {
     private Integer id;
     private String name;
     private Set<Integer> childIds;
+    private Integer teacherId;
 }

@@ -1,5 +1,6 @@
 package com.group3.kindergartenmanagementsystem.controller;
 
+import com.group3.kindergartenmanagementsystem.payload.TeacherDTO;
 import com.group3.kindergartenmanagementsystem.payload.UserDTO;
 import com.group3.kindergartenmanagementsystem.service.TeacherService;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ public class TeacherController {
     TeacherService teacherService;
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserDTO>> getAllTeacher(){
+    public ResponseEntity<List<TeacherDTO>> getAllTeacher(){
         return ResponseEntity.ok(teacherService.getAllTeacher());
     }
     @PutMapping("/{teacherId}/addToClass/{classroomId}")

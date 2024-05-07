@@ -1,11 +1,11 @@
 package com.group3.kindergartenmanagementsystem.service;
 
-import com.group3.kindergartenmanagementsystem.payload.ChildDTO;
-import com.group3.kindergartenmanagementsystem.payload.UserCreateDTO;
 import com.group3.kindergartenmanagementsystem.payload.UserDTO;
-import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
+
+import java.util.List;
 
 public interface UserService {
+    List<UserDTO> getAllUser();
     UserDTO getUserById(Integer id);
     UserDTO updateUserById(Integer id, UserDTO userDTO);
     UserDTO createNewUser(UserDTO userDTO);
