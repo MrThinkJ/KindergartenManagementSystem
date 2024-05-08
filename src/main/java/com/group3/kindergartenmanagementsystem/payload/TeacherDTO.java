@@ -17,5 +17,5 @@ public class TeacherDTO {
     private String phoneNumber;
     private String email;
     private String address;
-    private List<Integer> classroomIds;
+    private Integer classroomIds;
 }

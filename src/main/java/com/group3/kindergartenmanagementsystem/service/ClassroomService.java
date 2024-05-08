@@ -8,7 +8,7 @@ public interface ClassroomService {
     List<ClassroomDTO> getAllClassroom();
     ClassroomDTO getClassroomById(Integer id);
     ClassroomDTO getClassroomByChildId(Integer childId);
-    List<ClassroomDTO> getClassroomByTeacherId(Integer teacherId);
+    ClassroomDTO getClassroomByTeacherId(Integer teacherId);
     ClassroomDTO createNewClassroom(ClassroomDTO classroomDTO);
     ClassroomDTO updateClassroomById(Integer id, ClassroomDTO classroomDTO);
     String deleteClassroomById(Integer id);

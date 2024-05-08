@@ -38,6 +38,9 @@ public class TeacherServiceImpl implements TeacherService {
         User teacher = userRepository.findById(teacherId).orElseThrow(
                 ()-> new ResourceNotFoundException("Teacher", "id", teacherId)
         );
+        Classroom oldClass = classroomRepository.findByTeacher(teacher);
+        oldClass.setTeacher(null);
+        classroomRepository.save(oldClass);
         Classroom classroom = classroomRepository.findById(classroomId).orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId));
         classroom.setTeacher(teacher);
         classroomRepository.save(classroom);
@@ -65,7 +68,7 @@ public class TeacherServiceImpl implements TeacherService {
                         .address(user.getAddress())
                         .fullName(user.getFullName())
                         .phoneNumber(user.getPhoneNumber())
-                        .classroomIds(classroomRepository.findByTeacher(user).stream().map(Classroom::getId).collect(Collectors.toList()))
+                        .classroomIds(classroomRepository.findByTeacher(user).getId())
                         .build()
         ).collect(Collectors.toList());
     }

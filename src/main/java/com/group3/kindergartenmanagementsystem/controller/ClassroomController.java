@@ -37,7 +37,7 @@ public class ClassroomController {
 
     @GetMapping("/teacher/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ClassroomDTO>> getClassroomByTeacherId(@PathVariable Integer id){
+    public ResponseEntity<ClassroomDTO> getClassroomByTeacherId(@PathVariable Integer id){
         return ResponseEntity.ok(classroomService.getClassroomByTeacherId(id));
     }
 

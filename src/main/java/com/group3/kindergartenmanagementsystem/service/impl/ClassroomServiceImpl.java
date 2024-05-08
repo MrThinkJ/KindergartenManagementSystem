@@ -58,14 +58,14 @@ public class ClassroomServiceImpl implements ClassroomService {
     }
 
     @Override
-    public List<ClassroomDTO> getClassroomByTeacherId(Integer teacherId) {
+    public ClassroomDTO getClassroomByTeacherId(Integer teacherId) {
         User teacher = userRepository.findById(teacherId).orElseThrow(
                 ()-> new ResourceNotFoundException("Teacher", "id", teacherId)
         );
         if(!teacher.getRoles().contains(roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Teacher))))
             throw new APIException(HttpStatus.BAD_REQUEST, "This id is not belong to teacher");
-        List<Classroom> classrooms = classroomRepository.findByTeacher(teacher);
-        return classrooms.stream().map(this::mapToDTO).collect(Collectors.toList());
+        Classroom classrooms = classroomRepository.findByTeacher(teacher);
+        return mapToDTO(classrooms);
     }
 
     @Override
