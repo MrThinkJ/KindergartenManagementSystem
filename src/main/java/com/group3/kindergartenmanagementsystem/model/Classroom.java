@@ -20,7 +20,7 @@ public class Classroom {
     private Integer id;
     @Column(nullable = false)
     private String name;
-    @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "classroom")
     private Set<Child> children = new HashSet<>();
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")

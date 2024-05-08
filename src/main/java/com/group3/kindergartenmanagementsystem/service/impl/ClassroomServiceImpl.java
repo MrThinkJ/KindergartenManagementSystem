@@ -14,8 +14,10 @@ import com.group3.kindergartenmanagementsystem.repository.UserRepository;
 import com.group3.kindergartenmanagementsystem.service.ClassroomService;
 import com.group3.kindergartenmanagementsystem.service.SecurityService;
 import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.bytebuddy.asm.Advice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -92,9 +94,12 @@ public class ClassroomServiceImpl implements ClassroomService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public String deleteClassroomById(Integer id) {
         Classroom classroom = classroomRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Classroom", "id", id));
-        classroomRepository.delete(classroom);
+        classroomRepository.disassociateChildrenAndTeacher(id);
+        childRepository.setClassAndTeacherToNull(id);
+        classroomRepository.deleteById(id);
         return "Delete classroom successfully";
     }
 
