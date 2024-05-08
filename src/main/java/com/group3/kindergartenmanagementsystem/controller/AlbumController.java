@@ -53,7 +53,6 @@ public class AlbumController {
     }
 
     @GetMapping("/picture/{filename:.+}")
-    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<Resource> getFile(@PathVariable String filename){
         Resource file = fileStorageService.load(filename);
         return ResponseEntity.ok()
@@ -62,7 +61,6 @@ public class AlbumController {
     }
 
     @GetMapping("/download/picture/{filename:.+}")
-    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename){
         Resource file = fileStorageService.load(filename);
         return ResponseEntity.ok()

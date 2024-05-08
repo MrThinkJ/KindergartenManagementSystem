@@ -15,11 +15,13 @@ public class MedicineReminder {
     private Integer id;
     @Column(nullable = false)
     private String comment;
+    @Column(nullable = false)
+    private String currentStatus;
     @Column
     private LocalDateTime createdDate;
     @Column
     private LocalDateTime updatedDate;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "child_id")
     private Child child;
 }

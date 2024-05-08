@@ -51,6 +51,7 @@ public class MedicineReminderController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('PARENT')")
     public ResponseEntity<String> deleteMedicineReminder(@PathVariable Integer id){
+        medicineReminderService.deleteMedicineReminderById(id);
         return ResponseEntity.ok("Delete medicine reminder with id: "+id+" successfully");
     }
 }

@@ -40,6 +40,8 @@ public class SecurityConfig {
 
         httpSecurity.authorizeHttpRequests(authorize ->
                 authorize.requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/albums/picture/**").permitAll()
+                        .requestMatchers("/api/albums/download/picture/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

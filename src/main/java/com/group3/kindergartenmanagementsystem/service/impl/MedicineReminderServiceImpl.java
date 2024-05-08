@@ -62,6 +62,7 @@ public class MedicineReminderServiceImpl implements MedicineReminderService {
                     "User with username: "+securityService.getUsername()+" can't access to this child");
         MedicineReminder medicineReminder = new MedicineReminder();
         medicineReminder.setComment(medicineReminderDTO.getComment());
+        medicineReminder.setCurrentStatus(medicineReminderDTO.getCurrentStatus());
         medicineReminder.setChild(child);
         medicineReminder.setCreatedDate(LocalDateTime.now());
         medicineReminder.setUpdatedDate(LocalDateTime.now());
@@ -78,6 +79,7 @@ public class MedicineReminderServiceImpl implements MedicineReminderService {
             throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
                     "User with username: "+securityService.getUsername()+" can't access to this child");
         medicineReminder.setComment(medicineReminderDTO.getComment());
+        medicineReminder.setCurrentStatus(medicineReminderDTO.getCurrentStatus());
         medicineReminder.setUpdatedDate(LocalDateTime.now());
         MedicineReminder updatedMedicineReminder = medicineReminderRepository.save(medicineReminder);
         return mapToDTO(updatedMedicineReminder);
@@ -98,6 +100,7 @@ public class MedicineReminderServiceImpl implements MedicineReminderService {
         return MedicineReminderDTO.builder()
                 .id(medicineReminder.getId())
                 .comment(medicineReminder.getComment())
+                .currentStatus(medicineReminder.getCurrentStatus())
                 .childId(medicineReminder.getChild().getId())
                 .createdDate(medicineReminder.getCreatedDate())
                 .updatedDate(medicineReminder.getUpdatedDate())

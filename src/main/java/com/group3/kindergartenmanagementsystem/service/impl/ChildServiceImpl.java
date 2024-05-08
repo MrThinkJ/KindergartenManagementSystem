@@ -109,6 +109,7 @@ public class ChildServiceImpl implements ChildService {
                 childId->{
                     Child child = childRepository.findById(childId).orElseThrow(()-> new ResourceNotFoundException("Child", "id", childId));
                     child.setClassroom(classroom);
+                    child.setTeacher(classroom.getTeacher());
                     Child updatedChild = childRepository.save(child);
                     return mapToDTO(updatedChild);
                 }

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class MedicineReminderDTO {
     private Integer id;
     private String comment;
+    private String currentStatus;
     private Integer childId;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
