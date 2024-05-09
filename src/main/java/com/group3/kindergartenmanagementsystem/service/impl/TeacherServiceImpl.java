@@ -39,8 +39,10 @@ public class TeacherServiceImpl implements TeacherService {
                 ()-> new ResourceNotFoundException("Teacher", "id", teacherId)
         );
         Classroom oldClass = classroomRepository.findByTeacher(teacher);
-        oldClass.setTeacher(null);
-        classroomRepository.save(oldClass);
+        if (oldClass != null){
+            oldClass.setTeacher(null);
+            classroomRepository.save(oldClass);
+        }
         Classroom classroom = classroomRepository.findById(classroomId).orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId));
         classroom.setTeacher(teacher);
         classroomRepository.save(classroom);
