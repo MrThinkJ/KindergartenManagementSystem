@@ -20,7 +20,7 @@ public class TeacherController {
     public ResponseEntity<List<TeacherDTO>> getAllTeacher(){
         return ResponseEntity.ok(teacherService.getAllTeacher());
     }
-    @GetMapping
+    @GetMapping("/current")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<TeacherDTO> getCurrentTeacher(){
         return ResponseEntity.ok(teacherService.getCurrentTeacher());
