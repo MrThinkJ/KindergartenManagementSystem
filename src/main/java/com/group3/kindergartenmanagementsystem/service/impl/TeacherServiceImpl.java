@@ -62,14 +62,20 @@ public class TeacherServiceImpl implements TeacherService {
         roleSet.add(role);
         List<User> users = userRepository.findByRoles(roleSet);
         return users.stream().map(
-                user -> TeacherDTO.builder()
-                        .id(user.getId())
-                        .email(user.getEmail())
-                        .address(user.getAddress())
-                        .fullName(user.getFullName())
-                        .phoneNumber(user.getPhoneNumber())
-                        .classroomIds(classroomRepository.findByTeacher(user).getId())
-                        .build()
+                user -> {
+                    Classroom classroom = classroomRepository.findByTeacher(user);
+                    Integer classroomId = null;
+                    if (classroom != null)
+                        classroomId = classroom.getId();
+                    return TeacherDTO.builder()
+                            .id(user.getId())
+                            .email(user.getEmail())
+                            .address(user.getAddress())
+                            .fullName(user.getFullName())
+                            .phoneNumber(user.getPhoneNumber())
+                            .classroomIds(classroomId)
+                            .build();
+                }
         ).collect(Collectors.toList());
     }
 }
