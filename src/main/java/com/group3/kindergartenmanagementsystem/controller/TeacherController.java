@@ -20,6 +20,11 @@ public class TeacherController {
     public ResponseEntity<List<TeacherDTO>> getAllTeacher(){
         return ResponseEntity.ok(teacherService.getAllTeacher());
     }
+    @GetMapping
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<TeacherDTO> getCurrentTeacher(){
+        return ResponseEntity.ok(teacherService.getCurrentTeacher());
+    }
     @PutMapping("/{teacherId}/addToClass/{classroomId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> addTeacherToClass(@PathVariable Integer teacherId,

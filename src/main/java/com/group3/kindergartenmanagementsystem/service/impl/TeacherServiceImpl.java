@@ -13,6 +13,7 @@ import com.group3.kindergartenmanagementsystem.repository.ClassroomRepository;
 import com.group3.kindergartenmanagementsystem.repository.RoleRepository;
 import com.group3.kindergartenmanagementsystem.repository.UserRepository;
 import com.group3.kindergartenmanagementsystem.service.ChildService;
+import com.group3.kindergartenmanagementsystem.service.SecurityService;
 import com.group3.kindergartenmanagementsystem.service.TeacherService;
 import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
 import jakarta.transaction.Transactional;
@@ -31,6 +32,7 @@ public class TeacherServiceImpl implements TeacherService {
     ChildRepository childRepository;
     ClassroomRepository classroomRepository;
     RoleRepository roleRepository;
+    SecurityService securityService;
     UserRepository userRepository;
     @Override
     @Transactional(rollbackOn = Exception.class)
@@ -58,26 +60,34 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
+    public TeacherDTO getCurrentTeacher() {
+        User user = securityService.getCurrentUser();
+        return mapToDTO(user);
+    }
+
+    @Override
     public List<TeacherDTO> getAllTeacher() {
         Set<Role> roleSet = new HashSet<>();
         Role role = roleRepository.findByRoleName("ROLE_TEACHER");
         roleSet.add(role);
         List<User> users = userRepository.findByRoles(roleSet);
         return users.stream().map(
-                user -> {
-                    Classroom classroom = classroomRepository.findByTeacher(user);
-                    Integer classroomId = null;
-                    if (classroom != null)
-                        classroomId = classroom.getId();
-                    return TeacherDTO.builder()
-                            .id(user.getId())
-                            .email(user.getEmail())
-                            .address(user.getAddress())
-                            .fullName(user.getFullName())
-                            .phoneNumber(user.getPhoneNumber())
-                            .classroomIds(classroomId)
-                            .build();
-                }
+                this::mapToDTO
         ).collect(Collectors.toList());
+    }
+
+    private TeacherDTO mapToDTO(User user){
+        Classroom classroom = classroomRepository.findByTeacher(user);
+        Integer classroomId = null;
+        if (classroom != null)
+            classroomId = classroom.getId();
+        return TeacherDTO.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .address(user.getAddress())
+                .fullName(user.getFullName())
+                .phoneNumber(user.getPhoneNumber())
+                .classroomIds(classroomId)
+                .build();
     }
 }

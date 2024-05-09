@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface TeacherService {
     String addTeacherToClass(Integer teacherId, Integer classroomId);
+    TeacherDTO getCurrentTeacher();
     List<TeacherDTO> getAllTeacher();
 }
