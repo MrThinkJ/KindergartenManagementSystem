@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
     public NotificationDTO createNewNotification(NotificationDTO notificationDTO) {
         Notification notification = mapToEntity(notificationDTO);
         notification.setId(null);
+        notification.setPostDate(LocalDateTime.now());
         Notification newNotification = notificationRepository.save(notification);
         return mapToDTO(newNotification);
     }
