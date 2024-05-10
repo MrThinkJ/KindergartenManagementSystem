@@ -148,6 +148,13 @@ public class ChildServiceImpl implements ChildService {
             child.setTeacher(teacher);
             child.setClassroom(classroom);
         }
+        child.setFullName(childDTO.getFullName());
+        child.setAge(childDTO.getAge());
+        child.setBirthDay(childDTO.getBirthDay());
+        child.setHeight(childDTO.getHeight());
+        child.setWeight(childDTO.getWeight());
+        child.setGender(childDTO.getGender());
+        child.setHobby(childDTO.getHobby());
         Child updatedChild = childRepository.save(child);
         return mapToDTO(updatedChild);
     }
