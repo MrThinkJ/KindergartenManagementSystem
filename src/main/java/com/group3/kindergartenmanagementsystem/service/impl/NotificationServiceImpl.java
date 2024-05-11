@@ -33,8 +33,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationDTO createNewNotification(NotificationDTO notificationDTO) {
-        Notification notification = mapToEntity(notificationDTO);
+        Notification notification = new Notification();
         notification.setId(null);
+        notification.setTitle(notificationDTO.getTitle());
+        notification.setContent(notificationDTO.getContent());
         notification.setPostDate(LocalDateTime.now());
         Notification newNotification = notificationRepository.save(notification);
         return mapToDTO(newNotification);
@@ -62,7 +64,7 @@ public class NotificationServiceImpl implements NotificationService {
         return mapper.map(notification, NotificationDTO.class);
     }
 
-    private Notification mapToEntity(NotificationDTO notificationDTO){
-        return mapper.map(notificationDTO, Notification.class);
-    }
+//    private Notification mapToEntity(NotificationDTO notificationDTO){
+//        return mapper.map(notificationDTO, Notification.class);
+//    }
 }
