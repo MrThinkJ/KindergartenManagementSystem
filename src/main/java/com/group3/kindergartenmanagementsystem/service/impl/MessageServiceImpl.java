@@ -66,6 +66,16 @@ public class MessageServiceImpl implements MessageService {
         return mapToDTO(createdMessage);
     }
 
+    @Override
+    public void deleteMessageById(Integer messageId) {
+        Message message = messageRepository.findById(messageId).orElseThrow(()->new ResourceNotFoundException("Message", "id", messageId));
+        User sendUser = message.getFromUser();
+        if (!securityService.getCurrentUser().equals(sendUser)){
+            throw new APIException(HttpStatus.BAD_REQUEST, "You can not delete this message");
+        }
+        messageRepository.delete(message);
+    }
+
     private MessageDTO mapToDTO(Message message){
         return MessageDTO.builder()
                 .id(message.getId())

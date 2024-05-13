@@ -34,4 +34,10 @@ public class MessageController {
         return new ResponseEntity<>(messageService.createNewMessage(receiveUserId, messageDTO), HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('TEACHER', 'PARENT')")
+    public ResponseEntity<String> deleteMessageById(@PathVariable Integer id){
+        messageService.deleteMessageById(id);
+        return ResponseEntity.ok(String.format("Delete %s successfully", id));
+    }
 }

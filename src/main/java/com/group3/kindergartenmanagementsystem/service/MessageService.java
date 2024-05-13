@@ -8,4 +8,5 @@ public interface MessageService {
     List<MessageDTO> getAllMessageBetweenTwoUser(Integer userId);
     List<MessageDTO> getNewestMessage();
     MessageDTO createNewMessage(Integer receiveUserId, MessageDTO messageDTO);
+    void deleteMessageById(Integer messageId);
 }
