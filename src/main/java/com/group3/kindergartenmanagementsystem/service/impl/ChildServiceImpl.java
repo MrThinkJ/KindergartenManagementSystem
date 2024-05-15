@@ -111,6 +111,7 @@ public class ChildServiceImpl implements ChildService {
                     child.setClassroom(classroom);
                     if (classroom.getTeacher() != null)
                         child.setTeacher(classroom.getTeacher());
+                    child.setTeacher(null);
                     Child updatedChild = childRepository.save(child);
                     return mapToDTO(updatedChild);
                 }

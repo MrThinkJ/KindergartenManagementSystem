@@ -48,7 +48,7 @@ public class TeacherServiceImpl implements TeacherService {
         Classroom classroom = classroomRepository.findById(classroomId).orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId));
         classroom.setTeacher(teacher);
         classroomRepository.save(classroom);
-        List<Child> children = childRepository.findAllByTeacher(teacher);
+        List<Child> children = childRepository.findAllByClassroom(classroom);
         if(!teacher.getRoles().contains(roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Teacher))))
             throw new APIException(HttpStatus.BAD_REQUEST, "This id is not belong to teacher");
         children.forEach(child->{
