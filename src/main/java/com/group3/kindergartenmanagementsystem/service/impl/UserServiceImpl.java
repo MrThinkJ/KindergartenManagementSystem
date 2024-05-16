@@ -90,9 +90,11 @@ public class UserServiceImpl implements UserService {
             Classroom classroom = classroomRepository.findByTeacher(user);
             classroom.setTeacher(null);
             classroomRepository.save(classroom);
-            Child child = childRepository.findByTeacher(user);
-            child.setTeacher(null);
-            childRepository.save(child);
+            List<Child> children = childRepository.findAllByTeacher(user);
+            children.forEach(child -> {
+                child.setTeacher(null);
+                childRepository.save(child);
+            });
         }
         for (Role role : user.getRoles())
             role.getUsers().remove(user);
