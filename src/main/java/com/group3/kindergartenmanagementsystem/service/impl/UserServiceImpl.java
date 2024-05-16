@@ -16,6 +16,7 @@ import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,8 +89,10 @@ public class UserServiceImpl implements UserService {
         }
         if (user.getRoles().contains(roleRepository.findByRoleName("ROLE_TEACHER"))){
             Classroom classroom = classroomRepository.findByTeacher(user);
-            classroom.setTeacher(null);
-            classroomRepository.save(classroom);
+            if (classroom != null){
+                classroom.setTeacher(null);
+                classroomRepository.save(classroom);
+            }
             List<Child> children = childRepository.findAllByTeacher(user);
             children.forEach(child -> {
                 child.setTeacher(null);
