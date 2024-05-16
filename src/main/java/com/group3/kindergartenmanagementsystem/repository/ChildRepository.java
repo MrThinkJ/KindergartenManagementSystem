@@ -20,4 +20,5 @@ public interface ChildRepository extends JpaRepository<Child, Integer> {
     List<Child> findAllByTeacher(User teacher);
     List<Child> findAllByClassroom(Classroom classroom);
     Child findByParent(User parent);
+    Child findByTeacher(User teacher);
 }

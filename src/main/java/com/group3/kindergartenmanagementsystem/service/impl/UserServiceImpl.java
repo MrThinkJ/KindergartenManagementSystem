@@ -13,12 +13,12 @@ import com.group3.kindergartenmanagementsystem.repository.RoleRepository;
 import com.group3.kindergartenmanagementsystem.repository.UserRepository;
 import com.group3.kindergartenmanagementsystem.service.UserService;
 import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public UserDTO updateUserById(Integer id, UserDTO userDTO) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
         user.setFullName(userDTO.getFullName());
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public UserDTO createNewUser(UserDTO userDTO) {
         Role role = roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Teacher));
             Set<Role> roles = new HashSet<>();
@@ -77,11 +77,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void deleteUserById(Integer id) {
         User user = userRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("User", "id", id));
-        if(user.getRoles().contains(roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Parent)))){
+        if(user.getRoles().contains(roleRepository.findByRoleName("ROLE_PARENT"))){
             Child child = childRepository.findByParent(user);
             child.setTeacher(null);
             childRepository.delete(child);
@@ -90,6 +90,9 @@ public class UserServiceImpl implements UserService {
             Classroom classroom = classroomRepository.findByTeacher(user);
             classroom.setTeacher(null);
             classroomRepository.save(classroom);
+            Child child = childRepository.findByTeacher(user);
+            child.setTeacher(null);
+            childRepository.delete(child);
         }
         for (Role role : user.getRoles())
             role.getUsers().remove(user);
