@@ -46,7 +46,7 @@ public class AlbumController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('PARENT', 'TEACHER', 'ADMIN')")
     public ResponseEntity<String> deletePictureById(@PathVariable Integer id){
         albumService.deletePictureById(id);
         return ResponseEntity.ok("Delete successfully");

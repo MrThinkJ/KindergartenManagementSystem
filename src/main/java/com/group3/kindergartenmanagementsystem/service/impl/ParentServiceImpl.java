@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +45,7 @@ public class ParentServiceImpl implements ParentService {
         User newUser = userRepository.save(user);
         Child child = Child.builder()
                 .fullName(childDTO.getFullName())
-                .age(childDTO.getAge())
+                .age(LocalDateTime.now().getYear()-childDTO.getBirthDay().getYear())
                 .birthDay(childDTO.getBirthDay())
                 .height(childDTO.getHeight())
                 .weight(childDTO.getWeight())
