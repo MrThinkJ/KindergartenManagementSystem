@@ -3,10 +3,12 @@ package com.group3.kindergartenmanagementsystem.service.impl;
 import com.group3.kindergartenmanagementsystem.exception.APIException;
 import com.group3.kindergartenmanagementsystem.exception.ResourceNotFoundException;
 import com.group3.kindergartenmanagementsystem.model.Child;
+import com.group3.kindergartenmanagementsystem.model.Classroom;
 import com.group3.kindergartenmanagementsystem.model.Role;
 import com.group3.kindergartenmanagementsystem.model.User;
 import com.group3.kindergartenmanagementsystem.payload.UserDTO;
 import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
+import com.group3.kindergartenmanagementsystem.repository.ClassroomRepository;
 import com.group3.kindergartenmanagementsystem.repository.RoleRepository;
 import com.group3.kindergartenmanagementsystem.repository.UserRepository;
 import com.group3.kindergartenmanagementsystem.service.UserService;
@@ -29,6 +31,7 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     RoleRepository roleRepository;
     ChildRepository childRepository;
+    ClassroomRepository classroomRepository;
     ModelMapper mapper;
 
     @Override
@@ -82,6 +85,11 @@ public class UserServiceImpl implements UserService {
             Child child = childRepository.findByParent(user);
             child.setTeacher(null);
             childRepository.delete(child);
+        }
+        if (user.getRoles().contains(roleRepository.findByRoleName("ROLE_TEACHER"))){
+            Classroom classroom = classroomRepository.findByTeacher(user);
+            classroom.setTeacher(null);
+            classroomRepository.save(classroom);
         }
         for (Role role : user.getRoles())
             role.getUsers().remove(user);
