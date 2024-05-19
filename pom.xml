@@ -83,7 +83,6 @@
             <scope>runtime</scope>
         </dependency>
     </dependencies>
-    <packaging>jar</packaging>
     <build>
         <plugins>
             <plugin>
