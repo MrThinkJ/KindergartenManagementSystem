@@ -7,7 +7,7 @@ services:
       MYSQL_ROOT_PASSWORD: 28122003
       MYSQL_DATABASE: kindergarten
     ports:
-      - 3306:3306
+      - 3306
     networks:
       springboot-mysql-net:
   kindergarten:
@@ -20,7 +20,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      MYSQL_HOST: mysqldb
+      MYSQL_HOST: localhost
       MYSQL_PORT: 3306
       MYSQL_DBNAME: kindergarten
       MYSQL_USER: root
