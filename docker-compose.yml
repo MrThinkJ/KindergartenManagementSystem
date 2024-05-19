@@ -7,24 +7,25 @@ services:
       MYSQL_ROOT_PASSWORD: 28122003
       MYSQL_DATABASE: kindergarten
     ports:
-      - 3306
+      - 3306:3306
     networks:
       springboot-mysql-net:
   kindergarten:
+    container_name: kindergarten
     build:
-      context: .
+      context: ./
       dockerfile: Dockerfile
     depends_on:
       - mysqldb
-    restart: always
+    restart: on-failure
     ports:
       - 8080:8080
     environment:
-      MYSQL_HOST: localhost
-      MYSQL_PORT: 3306
-      MYSQL_DBNAME: kindergarten
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 28122003
+      - MYSQL_HOST=mysqldb
+      - MYSQL_PORT=3306
+      - MYSQL_DBNAME=kindergarten
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=28122003
     networks:
       springboot-mysql-net:
 networks:
