@@ -1,13 +1,4 @@
 services:
-  mysql:
-    container_name: mysql
-    image: mysql:latest
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: 28122003
-      MYSQL_DATABASE: kindergarten
-    ports:
-      - 3306:3306
   kindergarten:
     build: .
     depends_on:
@@ -21,3 +12,12 @@ services:
       MYSQL_DBNAME: kindergarten
       MYSQL_USER: root
       MYSQL_PASSWORD: 28122003
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 28122003
+      MYSQL_DATABASE: kindergarten
+    ports:
+      - 3307:3306
