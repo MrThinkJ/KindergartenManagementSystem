@@ -83,7 +83,7 @@
             <scope>runtime</scope>
         </dependency>
     </dependencies>
-
+    <packaging>jar</packaging>
     <build>
         <plugins>
             <plugin>
@@ -99,6 +99,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>Kindergarten</finalName>
     </build>
 
 </project>
