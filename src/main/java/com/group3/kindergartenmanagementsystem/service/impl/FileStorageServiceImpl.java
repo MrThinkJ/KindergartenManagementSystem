@@ -60,7 +60,6 @@ public class FileStorageServiceImpl implements FileStorageService {
         try {
             Path file = root.resolve(filename);
             Resource resource = new UrlResource(file.toUri());
-
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
@@ -79,9 +78,8 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Override
     public String delete(String fileName) {
         Path fileToDelete = root.resolve(fileName);
-        Path result = null;
         try {
-            result = Files.move(fileToDelete, bin.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(fileToDelete, bin.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e){
             throw new RuntimeException("Exception when delete file: "+e.getMessage());
         }

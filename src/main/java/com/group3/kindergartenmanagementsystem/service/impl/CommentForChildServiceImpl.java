@@ -56,7 +56,8 @@ public class CommentForChildServiceImpl implements CommentForChildService {
                     "User with username: "+securityService.getUsername()+" can't access to this child");
         CommentForChild comment = mapToEntity(commentForChildDTO);
         comment.setChild(child);
-        return null;
+        CommentForChild createdComment = commentForChildRepository.save(comment);
+        return mapToDTO(createdComment);
     }
 
     @Override
@@ -66,11 +67,11 @@ public class CommentForChildServiceImpl implements CommentForChildService {
         if (!securityService.isParentOrTeacherOfChild(child))
             throw new ForbiddenAccessException(HttpStatus.BAD_REQUEST,
                     "User with username: "+securityService.getUsername()+" can't access to this child");
-        comment.setComment(comment.getComment());
+        comment.setComment(commentForChildDTO.getComment());
         comment.setPostMonth(commentForChildDTO.getPostMonth());
         comment.setChild(child);
-        CommentForChild newComment = commentForChildRepository.save(comment);
-        return mapToDTO(newComment);
+        CommentForChild updatedComment = commentForChildRepository.save(comment);
+        return mapToDTO(updatedComment);
     }
 
     @Override
@@ -88,13 +89,14 @@ public class CommentForChildServiceImpl implements CommentForChildService {
                 .id(comment.getId())
                 .comment(comment.getComment())
                 .childId(comment.getChild().getId())
+                .postMonth(comment.getPostMonth())
                 .build();
     }
 
     private CommentForChild mapToEntity(CommentForChildDTO commentForChildDTO){
         return CommentForChild.builder()
-                .id(commentForChildDTO.getId())
                 .comment(commentForChildDTO.getComment())
+                .postMonth(commentForChildDTO.getPostMonth())
                 .build();
     }
 }

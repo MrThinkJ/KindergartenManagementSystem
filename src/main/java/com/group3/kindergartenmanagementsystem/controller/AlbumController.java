@@ -21,7 +21,6 @@ import java.util.List;
 @AllArgsConstructor
 public class AlbumController {
     AlbumService albumService;
-    FileStorageService fileStorageService;
     @GetMapping
     public ResponseEntity<List<AlbumDTO>> getAllPictures(){
         return ResponseEntity.ok(albumService.getAllPicture());
@@ -50,21 +49,5 @@ public class AlbumController {
     public ResponseEntity<String> deletePictureById(@PathVariable Integer id){
         albumService.deletePictureById(id);
         return ResponseEntity.ok("Delete successfully");
-    }
-
-    @GetMapping("/picture/{filename:.+}")
-    public ResponseEntity<Resource> getFile(@PathVariable String filename){
-        Resource file = fileStorageService.load(filename);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
-                .body(file);
-    }
-
-    @GetMapping("/download/picture/{filename:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String filename){
-        Resource file = fileStorageService.load(filename);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""+file.getFilename()+"\"")
-                .body(file);
     }
 }
