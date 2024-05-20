@@ -9,7 +9,6 @@ import com.group3.kindergartenmanagementsystem.payload.AlbumDTO;
 import com.group3.kindergartenmanagementsystem.repository.AlbumRepository;
 import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.service.AlbumService;
-import com.group3.kindergartenmanagementsystem.service.CloudinaryService;
 import com.group3.kindergartenmanagementsystem.service.FileStorageService;
 import com.group3.kindergartenmanagementsystem.service.SecurityService;
 import com.group3.kindergartenmanagementsystem.utils.AppConstants;
@@ -18,17 +17,10 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +28,6 @@ import java.util.stream.Collectors;
 public class AlbumServiceImpl implements AlbumService {
     AlbumRepository albumRepository;
     ChildRepository childRepository;
-    CloudinaryService cloudinaryService;
     FileStorageService fileStorageService;
     SecurityService securityService;
     ModelMapper mapper;

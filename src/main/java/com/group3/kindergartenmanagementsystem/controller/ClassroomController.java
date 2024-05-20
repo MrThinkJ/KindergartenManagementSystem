@@ -2,6 +2,7 @@ package com.group3.kindergartenmanagementsystem.controller;
 
 import com.group3.kindergartenmanagementsystem.payload.ClassroomDTO;
 import com.group3.kindergartenmanagementsystem.service.ClassroomService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,6 +58,8 @@ public class ClassroomController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteClassroomById(@PathVariable Integer id){
-        return ResponseEntity.ok(classroomService.deleteClassroomById(id));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "text/plain; charset=UTF-8");
+        return new ResponseEntity<>(classroomService.deleteClassroomById(id), headers, HttpStatus.OK);
     }
 }

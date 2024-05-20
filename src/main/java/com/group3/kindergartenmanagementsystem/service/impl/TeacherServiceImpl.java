@@ -7,19 +7,17 @@ import com.group3.kindergartenmanagementsystem.model.Classroom;
 import com.group3.kindergartenmanagementsystem.model.Role;
 import com.group3.kindergartenmanagementsystem.model.User;
 import com.group3.kindergartenmanagementsystem.payload.TeacherDTO;
-import com.group3.kindergartenmanagementsystem.payload.UserDTO;
 import com.group3.kindergartenmanagementsystem.repository.ChildRepository;
 import com.group3.kindergartenmanagementsystem.repository.ClassroomRepository;
 import com.group3.kindergartenmanagementsystem.repository.RoleRepository;
 import com.group3.kindergartenmanagementsystem.repository.UserRepository;
-import com.group3.kindergartenmanagementsystem.service.ChildService;
 import com.group3.kindergartenmanagementsystem.service.SecurityService;
 import com.group3.kindergartenmanagementsystem.service.TeacherService;
 import com.group3.kindergartenmanagementsystem.utils.ReceivedRole;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +33,7 @@ public class TeacherServiceImpl implements TeacherService {
     SecurityService securityService;
     UserRepository userRepository;
     @Override
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public String addTeacherToClass(Integer teacherId, Integer classroomId) {
         User teacher = userRepository.findById(teacherId).orElseThrow(
                 ()-> new ResourceNotFoundException("Teacher", "id", teacherId)
@@ -48,14 +46,10 @@ public class TeacherServiceImpl implements TeacherService {
         Classroom classroom = classroomRepository.findById(classroomId).orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId));
         classroom.setTeacher(teacher);
         classroomRepository.save(classroom);
-        List<Child> children = childRepository.findAllByClassroom(classroom);
+        List<Integer> children = childRepository.findAllIdByClassroomId(classroomId);
         if(!teacher.getRoles().contains(roleRepository.findByRoleName(ReceivedRole.getRoleName(ReceivedRole.Teacher))))
             throw new APIException(HttpStatus.BAD_REQUEST, "This id is not belong to teacher");
-        children.forEach(child->{
-            child.setTeacher(teacher);
-            childRepository.save(child);
-        });
-
+        childRepository.updateTeacherForChild(teacherId, children);
         return String.format("Add teacher %s to %s", teacher.getFullName(), classroom.getName());
     }
 

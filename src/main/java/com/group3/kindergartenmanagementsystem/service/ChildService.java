@@ -18,7 +18,7 @@ public interface ChildService {
 
     List<ChildDTO> addChildToClassroom(List<Integer> childId, Integer classroomId);
 
-    List<ChildDTO> addChildToTeacher(List<Integer> childId, Integer teacherId);
+//    List<ChildDTO> addChildToTeacher(List<Integer> childId, Integer teacherId);
 
     ChildDTO updateChildById(Integer id, ChildDTO childDTO);
 

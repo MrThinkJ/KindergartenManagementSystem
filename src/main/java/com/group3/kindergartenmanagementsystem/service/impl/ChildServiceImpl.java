@@ -105,36 +105,26 @@ public class ChildServiceImpl implements ChildService {
     @Transactional(rollbackOn = Exception.class)
     public List<ChildDTO> addChildToClassroom(List<Integer> childIds, Integer classroomId) {
         Classroom classroom = classroomRepository.findById(classroomId).orElseThrow(()-> new ResourceNotFoundException("Classroom", "id", classroomId));
-        return childIds.stream().map(
-                childId->{
-                    Child child = childRepository.findById(childId).orElseThrow(()-> new ResourceNotFoundException("Child", "id", childId));
-                    child.setClassroom(classroom);
-                    if (classroom.getTeacher() != null)
-                        child.setTeacher(classroom.getTeacher());
-                    else
-                        child.setTeacher(null);
-                    Child updatedChild = childRepository.save(child);
-                    return mapToDTO(updatedChild);
-                }
-        ).collect(Collectors.toList());
+        childRepository.addChildToClassroom(classroom.getId(), childIds);
+        return childRepository.findAllByClassroom(classroom).stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
-    @Override
-    @Transactional(rollbackOn = Exception.class)
-    public List<ChildDTO> addChildToTeacher(List<Integer> childIds, Integer teacherId) {
-        User teacher = userRepository.findById(teacherId).orElseThrow(()-> new ResourceNotFoundException("User", "id", teacherId));
-        Role teacherRole = roleRepository.findByRoleName("ROLE_TEACHER");
-        if (!teacher.getRoles().contains(teacherRole))
-            throw new APIException(HttpStatus.BAD_REQUEST, "This user doesn't have teacher role");
-        return childIds.stream().map(
-                childId ->{
-                    Child child = childRepository.findById(childId).orElseThrow(()-> new ResourceNotFoundException("Child", "id", childId));
-                    child.setTeacher(teacher);
-                    Child updatedChild = childRepository.save(child);
-                    return mapToDTO(updatedChild);
-                }
-        ).collect(Collectors.toList());
-    }
+//    @Override
+//    @Transactional(rollbackOn = Exception.class)
+//    public List<ChildDTO> addChildToTeacher(List<Integer> childIds, Integer teacherId) {
+//        User teacher = userRepository.findById(teacherId).orElseThrow(()-> new ResourceNotFoundException("User", "id", teacherId));
+//        Role teacherRole = roleRepository.findByRoleName("ROLE_TEACHER");
+//        if (!teacher.getRoles().contains(teacherRole))
+//            throw new APIException(HttpStatus.BAD_REQUEST, "This user doesn't have teacher role");
+//        return childIds.stream().map(
+//                childId ->{
+//                    Child child = childRepository.findById(childId).orElseThrow(()-> new ResourceNotFoundException("Child", "id", childId));
+//                    child.setTeacher(teacher);
+//                    Child updatedChild = childRepository.save(child);
+//                    return mapToDTO(updatedChild);
+//                }
+//        ).collect(Collectors.toList());
+//    }
 
     @Override
     public ChildDTO updateChildById(Integer id, ChildDTO childDTO) {

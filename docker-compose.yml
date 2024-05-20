@@ -10,6 +10,8 @@ services:
       - 3306:3306
     networks:
       springboot-mysql-net:
+    volumes:
+      - /opt/mysql_data:/var/lib/mysqldb
   kindergarten:
     container_name: kindergarten
     build:

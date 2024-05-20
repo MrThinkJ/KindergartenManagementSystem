@@ -81,8 +81,7 @@ public class ClassroomServiceImpl implements ClassroomService {
     @Override
     public ClassroomDTO updateClassroomById(Integer id, ClassroomDTO classroomDTO) {
         Classroom classroom = classroomRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Classroom", "id", id));
-        Set<Child> children = classroomDTO.getChildIds().stream().map(
-                childId -> childRepository.findById(childId).orElseThrow(()-> new ResourceNotFoundException("Child", "id", childId))).collect(Collectors.toSet());
+        Set<Child> children = childRepository.findByIds(classroomDTO.getChildIds());
         User teacher = userRepository.findById(classroomDTO.getTeacherId()).orElseThrow(
                 ()-> new ResourceNotFoundException("Teacher", "id", classroomDTO.getTeacherId())
         );
