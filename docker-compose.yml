@@ -28,6 +28,8 @@ services:
       - MYSQL_DBNAME=kindergarten
       - MYSQL_USER=root
       - MYSQL_PASSWORD=28122003
+    volumes:
+      - /opt/app:/var/lib/kindergarten
     networks:
       springboot-mysql-net:
 networks:
