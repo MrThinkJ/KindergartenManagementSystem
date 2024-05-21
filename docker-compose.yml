@@ -11,7 +11,7 @@ services:
     networks:
       springboot-mysql-net:
     volumes:
-      - /opt/mysql_data:/var/lib/mysqldb
+      - /opt/mysql_data:/var/lib/mysql
   kindergarten:
     container_name: kindergarten
     build:
@@ -29,7 +29,8 @@ services:
       - MYSQL_USER=root
       - MYSQL_PASSWORD=28122003
     volumes:
-      - /opt/app:/var/lib/kindergarten
+      - /opt/app/bin:/bin
+      - /opt/app/uploads:/uploads
     networks:
       springboot-mysql-net:
 networks:
