@@ -24,12 +24,12 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostById(id));
     }
     @PostMapping
-    public ResponseEntity<PostDTO> createNewPost(@RequestBody AddPostDTO addPostDTO){
+    public ResponseEntity<PostDTO> createNewPost(@ModelAttribute AddPostDTO addPostDTO){
         return new ResponseEntity<>(postService.createNewPost(addPostDTO), HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
     public ResponseEntity<PostDTO> updatePostById(@PathVariable Integer id,
-                                                  @RequestBody AddPostDTO addPostDTO){
+                                                  @ModelAttribute AddPostDTO addPostDTO){
         return ResponseEntity.ok(postService.updatePostById(id, addPostDTO));
     }
     @DeleteMapping("/{id}")

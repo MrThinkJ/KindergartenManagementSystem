@@ -50,8 +50,10 @@ public class PostServiceImpl implements PostService {
     public PostDTO updatePostById(Integer postId, AddPostDTO addPostDTO) {
         Post post = postRepository.findById(postId).orElseThrow(()-> new ResourceNotFoundException("Post", "id", postId));
         String fileName = null;
-        if (addPostDTO.getImage() != null)
+        if (addPostDTO.getImage() != null){
+            fileStorageService.delete(post.getImage());
             fileName = fileStorageService.save(addPostDTO.getImage());
+        }
         post.setTitle(addPostDTO.getTitle());
         post.setContent(addPostDTO.getContent());
         post.setImage(fileName);

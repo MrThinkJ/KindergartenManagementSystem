@@ -29,8 +29,8 @@ services:
       - MYSQL_USER=root
       - MYSQL_PASSWORD=28122003
     volumes:
-      - /opt/app/bin:/bin
-      - /opt/app/uploads:/uploads
+      - /opt/app/bin:/app/bin
+      - /opt/app/uploads:/app/uploads
     networks:
       springboot-mysql-net:
 networks:

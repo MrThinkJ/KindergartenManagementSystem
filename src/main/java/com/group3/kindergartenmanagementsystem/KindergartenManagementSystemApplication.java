@@ -19,7 +19,6 @@ public class KindergartenManagementSystemApplication implements CommandLineRunne
     public static void main(String[] args) {
         SpringApplication.run(KindergartenManagementSystemApplication.class, args);
     }
-
     @Override
     public void run(String... args) throws Exception {
         fileStorageService.init();
